@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Emotion Explorer Passport / Mi Pasaporte de Explorador</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Quicksand', sans-serif; }
+        .font-fredoka { font-family: 'Fredoka', cursive; }
+        .book-shadow { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1); }
+        .badge-locked { filter: grayscale(100%) opacity(0.4); transition: all 0.3s ease; }
+        .badge-unlocked { filter: grayscale(0%) opacity(1); transform: scale(1.05); transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="bg-amber-50 min-h-screen flex flex-col items-center justify-between p-4 md:p-8">
+
+    <!-- Header / Navbar -->
+    <header class="w-full max-w-5xl flex justify-between items-center bg-white/80 backdrop-blur-md px-6 py-4 rounded-2xl shadow-sm mb-6 border border-amber-100">
+        <div class="flex items-center space-x-3">
+            <span class="text-3xl">📘</span>
+            <div>
+                <h1 class="font-fredoka text-xl md:text-2xl text-amber-900">The Valley of Emotions</h1>
+                <p class="text-xs text-amber-700 font-semibold">Bilingual Classroom Passport</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="openTeacherModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md transition flex items-center gap-2">
+                <span>🔐</span> Teacher Panel
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Passport Container -->
+    <main class="w-full max-w-5xl bg-amber-100 rounded-3xl p-6 md:p-10 book-shadow border-4 border-amber-200 relative overflow-hidden mb-6">
+        
+        <!-- Student Selector Bar -->
+        <div class="bg-white/90 p-4 rounded-2xl shadow-inner mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 border border-amber-200">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <span class="text-2xl">🕵️‍♀️</span>
+                <div>
+                    <label class="block text-xs font-bold text-amber-800 uppercase tracking-wider">Select Student / Estudiante:</label>
+                    <select id="studentSelect" onchange="changeStudent(this.value)" class="bg-amber-50 border border-amber-300 font-fredoka text-amber-900 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium text-lg w-full sm:w-64">
+                        <!-- Generado por JS -->
+                    </select>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">Total Badges Earned:</span>
+                <span id="earnedCount" class="font-fredoka text-2xl text-amber-600">0 / 5</span>
+            </div>
+        </div>
+
+        <!-- Passport Title & Header Inside -->
+        <div class="text-center mb-8">
+            <h2 class="font-fredoka text-3xl md:text-4xl text-amber-900 tracking-wide drop-shadow-sm">MY EMOTION EXPLORER PASSPORT</h2>
+            <p class="font-fredoka text-xl text-amber-700">Mi Pasaporte de Explorador</p>
+        </div>
+
+        <!-- Badges Grid (4 Main Badges) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            
+            <!-- Badge 1 -->
+            <div class="bg-white/95 p-5 rounded-2xl shadow-md border-2 border-amber-200 flex flex-col items-center text-center relative">
+                <div id="badge-1-img" class="w-28 h-28 mb-3 flex items-center justify-center bg-amber-50 rounded-full border border-amber-100 badge-locked text-5xl shadow-inner">
+                    🐰
+                </div>
+                <h3 class="font-fredoka text-amber-900 text-lg mb-1">Heart Listener</h3>
+                <p class="text-xs text-slate-600 font-medium mb-3">Awarded by Luna</p>
+                <span id="badge-1-status" class="mt-auto px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-full">Locked 🔒</span>
+            </div>
+
+            <!-- Badge 2 -->
+            <div class="bg-white/95 p-5 rounded-2xl shadow-md border-2 border-amber-200 flex flex-col items-center text-center relative">
+                <div id="badge-2-img" class="w-28 h-28 mb-3 flex items-center justify-center bg-amber-50 rounded-full border border-amber-100 badge-locked text-5xl shadow-inner">
+                    🐶🐱🐴
+                </div>
+                <h3 class="font-fredoka text-amber-900 text-lg mb-1">Sound Detective</h3>
+                <p class="text-xs text-slate-600 font-medium mb-3">Awarded by Road Animals</p>
+                <span id="badge-2-status" class="mt-auto px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-full">Locked 🔒</span>
+            </div>
+
+            <!-- Badge 3 -->
+            <div class="bg-white/95 p-5 rounded-2xl shadow-md border-2 border-amber-200 flex flex-col items-center text-center relative">
+                <div id="badge-3-img" class="w-28 h-28 mb-3 flex items-center justify-center bg-amber-50 rounded-full border border-amber-100 badge-locked text-5xl shadow-inner">
+                    🐻
+                </div>
+                <h3 class="font-fredoka text-amber-900 text-lg mb-1">Emotion Reader</h3>
+                <p class="text-xs text-slate-600 font-medium mb-3">Awarded by Little Bear</p>
+                <span id="badge-3-status" class="mt-auto px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-full">Locked 🔒</span>
+            </div>
+
+            <!-- Badge 4 -->
+            <div class="bg-white/95 p-5 rounded-2xl shadow-md border-2 border-amber-200 flex flex-col items-center text-center relative">
+                <div id="badge-4-img" class="w-28 h-28 mb-3 flex items-center justify-center bg-amber-50 rounded-full border border-amber-100 badge-locked text-5xl shadow-inner">
+                    🦫
+                </div>
+                <h3 class="font-fredoka text-amber-900 text-lg mb-1">Kindness Hero</h3>
+                <p class="text-xs text-slate-600 font-medium mb-3">Awarded by Capybara</p>
+                <span id="badge-4-status" class="mt-auto px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-full">Locked 🔒</span>
+            </div>
+
+        </div>
+
+        <!-- Capstone Medal (Full Width Bottom) -->
+        <div class="bg-gradient-to-r from-amber-500 to-yellow-500 p-6 rounded-2xl shadow-lg border-2 border-yellow-300 text-white flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-4 text-center md:text-left">
+                <div id="badge-5-img" class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-4xl badge-locked border-2 border-white/40 shrink-0 shadow-inner">
+                    🏅
+                </div>
+                <div>
+                    <span class="bg-yellow-700/40 text-yellow-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-1 inline-block">Capstone Medal</span>
+                    <h3 class="font-fredoka text-2xl">Master Emotion Explorer</h3>
+                    <p class="text-sm text-amber-100 font-medium">Awarded upon completion of four badges from the Valley Friends</p>
+                </div>
+            </div>
+            <div>
+                <span id="badge-5-status" class="px-4 py-2 bg-yellow-900/40 text-yellow-100 text-sm font-bold rounded-xl border border-yellow-300/30">Locked 🔒</span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Teacher Access Modal -->
+    <div id="teacherModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-amber-100">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-fredoka text-2xl text-amber-900">Teacher Panel Access</h3>
+                <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold">×</button>
+            </div>
+            <div id="pinSection">
+                <p class="text-sm text-slate-600 mb-4">Enter teacher PIN to manage student badges (Default PIN: <span class="font-bold text-amber-600">1234</span>):</p>
+                <input type="password" id="teacherPinInput" placeholder="Enter PIN..." class="w-full bg-amber-50 border border-amber-300 px-4 py-3 rounded-xl font-fredoka text-lg text-center mb-4 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <button onclick="verifyPin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-fredoka py-3 rounded-xl shadow-md transition">Unlock Panel</button>
+            </div>
+            <div id="managementSection" class="hidden">
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-amber-800 uppercase mb-1">Add New Student:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="newStudentName" placeholder="Student Full Name" class="flex-1 bg-amber-50 border border-amber-300 px-3 py-2 rounded-xl text-sm focus:outline-none">
+                        <button onclick="addStudent()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-bold">Add</button>
+                    </div>
+                </div>
+                <hr class="my-4 border-amber-100">
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-amber-800 uppercase mb-1">Manage Badges for Selected Student:</label>
+                    <div id="badgeCheckboxes" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        <!-- Checkboxes generados por JS -->
+                    </div>
+                </div>
+                <button onclick="closeTeacherModal()" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-fredoka py-2.5 rounded-xl text-sm transition">Close Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-xs text-amber-800 font-semibold text-center">
+        The Valley of Emotions • Bilingual Early Childhood Education © 2026
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Initial Data Store
+        let studentsData = JSON.parse(localStorage.getItem('valley_students_data')) || [
+            { name: "Manuela Ramírez", badges: [true, false, true, false, false] },
+            { name: "Sofia Gomez", badges: [true, true, true, true, true] },
+            { name: "Alejandro Ruiz", badges: [false, false, false, false, false] }
+        ];
+
+        let currentStudentIndex = 0;
+
+        function saveToStorage() {
+            localStorage.setItem('valley_students_data', JSON.stringify(studentsData));
+        }
+
+        function initApp() {
+            updateStudentDropdown();
+            renderPassport();
+        }
+
+        function updateStudentDropdown() {
+            const select = document.getElementById('studentSelect');
+            select.innerHTML = '';
+            studentsData.forEach((student, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = student.name;
+                if (index === currentStudentIndex) option.selected = true;
+                select.appendChild(option);
+            });
+        }
+
+        function changeStudent(index) {
+            currentStudentIndex = parseInt(index);
+            renderPassport();
+        }
+
+        function renderPassport() {
+            const student = studentsData[currentStudentIndex];
+            let earnedCount = 0;
+
+            // Check badges 1 to 4
+            for (let i = 0; i < 4; i++) {
+                const imgEl = document.getElementById(`badge-${i+1}-img`);
+                const statusEl = document.getElementById(`badge-${i+1}-status`);
+                
+                if (student.badges[i]) {
+                    imgEl.classList.remove('badge-locked');
+                    imgEl.classList.add('badge-unlocked');
+                    statusEl.textContent = 'Unlocked ⭐';
+                    statusEl.className = 'mt-auto px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full';
+                    earnedCount++;
+                } else {
+                    imgEl.classList.remove('badge-unlocked');
+                    imgEl.classList.add('badge-locked');
+                    statusEl.textContent = 'Locked 🔒';
+                    statusEl.className = 'mt-auto px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-full';
+                }
+            }
+
+            // Capstone badge (index 4) - Auto unlocks if 4 badges are earned OR if teacher checked it
+            const capstoneUnlocked = earnedCount >= 4 || student.badges[4];
+            student.badges[4] = capstoneUnlocked; // Sincronizar estado
+
+            const capImg = document.getElementById('badge-5-img');
+            const capStatus = document.getElementById('badge-5-status');
+            
+            if (capstoneUnlocked) {
+                capImg.classList.remove('badge-locked');
+                capImg.classList.add('badge-unlocked');
+                capStatus.textContent = 'Master Medal Unlocked 🏆';
+                earnedCount++;
+            } else {
+                capImg.classList.remove('badge-unlocked');
+                capImg.classList.add('badge-locked');
+                capStatus.textContent = 'Locked 🔒';
+            }
+
+            document.getElementById('earnedCount').textContent = `${earnedCount} / 5`;
+        }
+
+        // Teacher Modal Logic
+        function openTeacherModal() {
+            document.getElementById('teacherModal').classList.remove('hidden');
+            document.getElementById('teacherPinInput').value = '';
+            document.getElementById('pinSection').classList.remove('hidden');
+            document.getElementById('managementSection').classList.add('hidden');
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('teacherModal').classList.add('hidden');
+            renderPassport();
+            updateStudentDropdown();
+        }
+
+        function verifyPin() {
+            const pin = document.getElementById('teacherPinInput').value;
+            if (pin === '1234') {
+                document.getElementById('pinSection').classList.add('hidden');
+                document.getElementById('managementSection').classList.remove('hidden');
+                renderTeacherCheckboxes();
+            } else {
+                alert('Incorrect PIN. Try 1234');
+            }
+        }
+
+        function addStudent() {
+            const nameInput = document.getElementById('newStudentName');
+            const name = nameInput.value.trim();
+            if (name) {
+                studentsData.push({ name: name, badges: [false, false, false, false, false] });
+                saveToStorage();
+                nameInput.value = '';
+                currentStudentIndex = studentsData.length - 1;
+                updateStudentDropdown();
+                renderTeacherCheckboxes();
+                renderPassport();
+            }
+        }
+
+        function renderTeacherCheckboxes() {
+            const container = document.getElementById('badgeCheckboxes');
+            container.innerHTML = '';
+            const student = studentsData[currentStudentIndex];
+            
+            const badgeNames = [
+                "1. Heart Listener Badge (Luna)",
+                "2. Sound Detective Badge (Animals)",
+                "3. Emotion Reader Badge (Little Bear)",
+                "4. Kindness Hero Badge (Capybara)",
+                "5. Capstone Master Medal"
+            ];
+
+            badgeNames.forEach((bName, idx) => {
+                const label = document.label = document.createElement('label');
+                label.className = 'flex items-center justify-between bg-amber-50 p-2 rounded-xl border border-amber-200 text-sm font-medium text-amber-900 cursor-pointer';
+                
+                const span = document.createElement('span');
+                span.textContent = bName;
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = student.badges[idx];
+                checkbox.className = 'w-5 h-5 accent-amber-600 rounded cursor-pointer';
+                checkbox.onchange = (e) => {
+                    student.badges[idx] = e.target.checked;
+                    saveToStorage();
+                    renderPassport();
+                };
+
+                label.appendChild(span);
+                label.appendChild(checkbox);
+                container.appendChild(label);
+            });
+        }
+
+        // Initialize on load
+        window.onload = initApp;
+    </script>
+</body>
+</html>
