@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Valley of Feelings — Junior Explorers Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream-bg: #FAF3E0;
+      --parchment: #FFFDF7;
+      --forest-green: #3E6B48;
+      --forest-light: #5C8D67;
+      --gold-sun: #F4C44E;
+      --gold-dark: #D49B27;
+      --brown-text: #4A3525;
+      --brown-soft: #7A5C43;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      color: var(--brown-text);
+      min-height: 100vh;
+      background: linear-gradient(125deg, #DCE6EC 0%, #FAF3E0 45%, #FFF4CC 78%, #E3F1D8 100%);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Barra de herramientas: oculta por defecto para los padres */
+    .controls-bar {
+      width: 100%;
+      max-width: 1200px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 253, 247, 0.95);
+      border: 2px dashed var(--forest-light);
+      border-radius: 16px;
+      padding: 12px 18px;
+      margin-bottom: 18px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    body.admin-mode .controls-bar {
+      display: flex;
+    }
+
+    .controls-bar span {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--forest-green);
+    }
+
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    button {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-2px); }
+    .btn-add { background: var(--forest-green); color: #fff; }
+    .btn-export { background: #3A7CA5; color: #fff; }
+    .btn-lock { background: var(--gold-sun); color: var(--brown-text); }
+
+    /* Lienzo Principal */
+    .storybook-board {
+      width: 100%;
+      max-width: 1200px;
+      background: var(--parchment);
+      border-radius: 32px;
+      border: 6px solid var(--forest-green);
+      box-shadow: 0 18px 40px rgba(62, 107, 72, 0.18);
+      position: relative;
+      overflow: hidden;
+      padding: 28px 32px 34px;
+    }
+
+    .sky-decor {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 190px;
+      pointer-events: none; z-index: 0;
+      background: linear-gradient(90deg, rgba(196, 214, 224, 0.45) 0%, rgba(255, 245, 204, 0.65) 55%, rgba(255, 226, 138, 0.55) 100%);
+    }
+
+    .rainbow-arc {
+      position: absolute;
+      top: -55px; right: 60px; width: 340px; height: 180px;
+      border-radius: 200px 200px 0 0;
+      border-top: 10px solid rgba(247, 168, 184, 0.45);
+      box-shadow:
+        inset 0 10px 0 rgba(253, 216, 117, 0.45),
+        inset 0 20px 0 rgba(168, 224, 179, 0.45),
+        inset 0 30px 0 rgba(142, 202, 230, 0.45);
+      pointer-events: none; z-index: 0;
+    }
+
+    .board-header {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; margin-bottom: 22px;
+    }
+
+    .title-center { text-align: center; flex: 1; }
+
+    .title-center h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 2.2rem; font-weight: 700;
+      color: var(--brown-text);
+      text-shadow: 2px 2px 0px var(--gold-sun);
+      cursor: default;
+      user-select: none;
+    }
+
+    .title-center p {
+      font-size: 1.05rem; font-weight: 800;
+      color: var(--forest-green); margin-top: 4px;
+    }
+
+    .goal-pill {
+      display: inline-block;
+      background: var(--gold-sun); color: var(--brown-text);
+      font-family: 'Fredoka', sans-serif; font-weight: 700;
+      font-size: 0.92rem; padding: 4px 14px;
+      border-radius: 20px; margin-top: 6px;
+      border: 2px solid var(--brown-text);
+    }
+
+    .character-cluster { display: flex; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .char-svg { width: 72px; height: 72px; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.12)); }
+
+    .table-wrapper {
+      position: relative; z-index: 2;
+      overflow-x: auto; border-radius: 22px;
+      border: 3px solid var(--forest-green); background: #fff;
+    }
+
+    table { width: 100%; border-collapse: collapse; text-align: center; }
+    thead { background: var(--forest-green); color: #fff; font-family: 'Fredoka', sans-serif; }
+    th { padding: 14px 10px; font-size: 0.98rem; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); }
+    th small { display: block; font-family: 'Nunito', sans-serif; font-size: 0.75rem; font-weight: 700; color: var(--gold-sun); }
+
+    tbody tr:nth-child(odd) { background-color: #FFFDF7; }
+    tbody tr:nth-child(even) { background-color: #F4F9F2; }
+    td { padding: 12px 10px; border-bottom: 2px solid #E8EFE6; vertical-align: middle; }
+
+    .rank-badge {
+      font-family: 'Fredoka', sans-serif; font-size: 1.35rem; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 42px; height: 42px; border-radius: 50%;
+    }
+    .rank-1 { background: #FFE07D; border: 2px solid #D49B27; }
+    .rank-2 { background: #E6ECF0; border: 2px solid #9AA8B2; }
+    .rank-3 { background: #F5D0B5; border: 2px solid #C28255; }
+    .rank-other { background: #EFE8DC; font-size: 1.05rem; }
+
+    /* Avatar */
+    .avatar-slot {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 3px solid var(--gold-dark);
+      background: #FFF9E6; margin: 0 auto;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    body.admin-mode .avatar-slot {
+      border-style: dashed;
+      cursor: pointer;
+    }
+
+    .avatar-slot img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-placeholder { font-size: 0.75rem; font-weight: 800; color: var(--brown-soft); line-height: 1.1; }
+
+    .student-name {
+      font-family: 'Fredoka', sans-serif; font-size: 1.1rem; font-weight: 600;
+      color: var(--brown-text); text-align: left; padding-left: 8px;
+    }
+    .companion-sub { display: block; font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--forest-green); }
+
+    /* Puntajes: texto limpio para padres, input solo en modo admin */
+    .score-display {
+      font-family: 'Fredoka', sans-serif; font-size: 1.05rem; font-weight: 600;
+      color: var(--brown-text);
+    }
+
+    .score-input {
+      width: 58px; text-align: center;
+      font-family: 'Fredoka', sans-serif; font-size: 1.05rem; font-weight: 600;
+      color: var(--brown-text); background: #FAF3E0;
+      border: 2px solid #D8CCB8; border-radius: 10px; padding: 4px;
+    }
+
+    .total-pill {
+      font-family: 'Fredoka', sans-serif; font-size: 1.2rem; font-weight: 700;
+      background: var(--gold-sun); color: var(--brown-text);
+      padding: 6px 14px; border-radius: 16px; display: inline-block;
+      border: 2px solid var(--brown-text);
+    }
+
+    .badges-row { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+
+    .badge-chip {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 2px solid #D5C8B4; background: #F4EFE6;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; opacity: 0.3; filter: grayscale(100%);
+      user-select: none;
+    }
+
+    body.admin-mode .badge-chip { cursor: pointer; }
+
+    .badge-chip.unlocked {
+      opacity: 1; filter: grayscale(0%);
+      background: #FFF6D6; border-color: var(--gold-dark);
+      box-shadow: 0 2px 6px rgba(212, 155, 39, 0.35);
+    }
+
+    .badge-chip.capstone.unlocked {
+      background: linear-gradient(135deg, #FFE27A, #F7A8B8);
+      border-color: var(--brown-text);
+    }
+
+    .footer-legends {
+      position: relative; z-index: 2;
+      display: grid; grid-template-columns: 1.6fr 1fr;
+      gap: 16px; margin-top: 22px;
+    }
+
+    .legend-card {
+      background: var(--cream-bg); border: 2.5px solid var(--forest-light);
+      border-radius: 20px; padding: 14px 18px;
+    }
+
+    .legend-card h3 {
+      font-family: 'Fredoka', sans-serif; font-size: 1.05rem;
+      color: var(--forest-green); margin-bottom: 10px;
+    }
+
+    .badges-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(195px, 1fr)); gap: 8px; }
+    .badge-info {
+      background: #fff; border-radius: 12px; padding: 7px 10px;
+      border: 1.5px solid #E5D9C5; font-size: 0.82rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .badge-info strong { display: block; color: var(--brown-text); font-size: 0.85rem; }
+    .badge-info span { color: var(--brown-soft); font-weight: 700; font-size: 0.75rem; }
+
+    .points-list { list-style: none; font-size: 0.85rem; font-weight: 700; display: flex; flex-direction: column; gap: 6px; }
+    .points-list li { background: #fff; padding: 6px 10px; border-radius: 10px; border: 1.5px solid #E5D9C5; }
+
+    .action-col { display: none; }
+    body.admin-mode .action-col { display: table-cell; }
+    .delete-row-btn { background: none; border: none; color: #B85D5D; font-size: 1rem; cursor: pointer; }
+
+    @media (max-width: 900px) {
+      .footer-legends { grid-template-columns: 1fr; }
+      .board-header { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra exclusiva para la docente (oculta para padres) -->
+  <div class="controls-bar">
+    <span>🔓 Modo Docente Activo: Edita nombres, puntos, insignias o sube dibujos.</span>
+    <div class="btn-group">
+      <button class="btn-add" onclick="addStudent()">+ Agregar Estudiante</button>
+      <button class="btn-export" onclick="exportUpdatedHTML()">💾 Guardar Archivo Actualizado</button>
+      <button class="btn-lock" onclick="lockBoard()">🔒 Bloquear (Vista Padres)</button>
+    </div>
+  </div>
+
+  <div class="storybook-board">
+    <div class="sky-decor"></div>
+    <div class="rainbow-arc"></div>
+
+    <div class="board-header">
+      <div class="character-cluster">
+        <!-- Little Bear -->
+        <svg class="char-svg" viewBox="0 0 100 100">
+          <circle cx="26" cy="28" r="14" fill="#9C663B" stroke="#4A3525" stroke-width="3"/>
+          <circle cx="26" cy="28" r="7" fill="#D9A377"/>
+          <circle cx="74" cy="28" r="14" fill="#9C663B" stroke="#4A3525" stroke-width="3"/>
+          <circle cx="74" cy="28" r="7" fill="#D9A377"/>
+          <circle cx="50" cy="54" r="34" fill="#A97142" stroke="#4A3525" stroke-width="3.5"/>
+          <ellipse cx="50" cy="63" rx="16" ry="13" fill="#E8C39E"/>
+          <circle cx="38" cy="48" r="4" fill="#4A3525"/>
+          <circle cx="62" cy="48" r="4" fill="#4A3525"/>
+          <ellipse cx="50" cy="58" rx="6" ry="4.5" fill="#4A3525"/>
+          <path d="M43 66 Q50 72 57 66" fill="none" stroke="#4A3525" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <!-- Luna -->
+        <svg class="char-svg" viewBox="0 0 100 100">
+          <ellipse cx="38" cy="26" rx="8" ry="22" transform="rotate(-10 38 26)" fill="#E6E1DC" stroke="#4A3525" stroke-width="3"/>
+          <ellipse cx="38" cy="26" rx="4" ry="15" transform="rotate(-10 38 26)" fill="#F7B8C6"/>
+          <ellipse cx="62" cy="26" rx="8" ry="22" transform="rotate(10 62 26)" fill="#E6E1DC" stroke="#4A3525" stroke-width="3"/>
+          <ellipse cx="62" cy="26" rx="4" ry="15" transform="rotate(10 62 26)" fill="#F7B8C6"/>
+          <circle cx="50" cy="62" r="28" fill="#F2EFE9" stroke="#4A3525" stroke-width="3.5"/>
+          <circle cx="40" cy="58" r="3.5" fill="#4A3525"/>
+          <circle cx="60" cy="58" r="3.5" fill="#4A3525"/>
+          <polygon points="46,65 54,65 50,70" fill="#F28B9E"/>
+          <path d="M44 73 Q50 77 56 73" fill="none" stroke="#4A3525" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="title-center">
+        <!-- Doble clic en el título desbloquea el modo docente -->
+        <h1 ondblclick="unlockPrompt()" title="The Valley of Feelings">🌈 THE VALLEY OF FEELINGS ☀️</h1>
+        <p>Junior Explorers Leaderboard • Bringing Sunlight & Colors Back Through English</p>
+        <div class="goal-pill">🏆 Valley Goal: 400 Sunlight Points + Master Emotion Explorer Medal</div>
+      </div>
+
+      <div class="character-cluster">
+        <!-- Road Animal -->
+        <svg class="char-svg" viewBox="0 0 100 100">
+          <ellipse cx="24" cy="48" rx="10" ry="18" transform="rotate(15 24 48)" fill="#8C5832" stroke="#4A3525" stroke-width="3"/>
+          <ellipse cx="76" cy="48" rx="10" ry="18" transform="rotate(-15 76 48)" fill="#8C5832" stroke="#4A3525" stroke-width="3"/>
+          <circle cx="50" cy="54" r="30" fill="#D49B54" stroke="#4A3525" stroke-width="3.5"/>
+          <circle cx="39" cy="49" r="3.8" fill="#4A3525"/>
+          <circle cx="61" cy="49" r="3.8" fill="#4A3525"/>
+          <ellipse cx="50" cy="60" rx="6" ry="4.5" fill="#4A3525"/>
+          <path d="M43 67 Q50 74 57 67" fill="none" stroke="#4A3525" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <!-- Stitch -->
+        <svg class="char-svg" viewBox="0 0 100 100">
+          <ellipse cx="20" cy="42" rx="16" ry="9" transform="rotate(-25 20 42)" fill="#4B8BBE" stroke="#2B4C6F" stroke-width="3"/>
+          <ellipse cx="20" cy="42" rx="10" ry="5" transform="rotate(-25 20 42)" fill="#F29CB7"/>
+          <ellipse cx="80" cy="42" rx="16" ry="9" transform="rotate(25 80 42)" fill="#4B8BBE" stroke="#2B4C6F" stroke-width="3"/>
+          <ellipse cx="80" cy="42" rx="10" ry="5" transform="rotate(25 80 42)" fill="#F29CB7"/>
+          <ellipse cx="50" cy="56" rx="31" ry="28" fill="#5499C7" stroke="#2B4C6F" stroke-width="3.5"/>
+          <ellipse cx="38" cy="52" rx="7" ry="9" fill="#1F3A52"/>
+          <circle cx="36" cy="49" r="2.5" fill="#fff"/>
+          <ellipse cx="62" cy="52" rx="7" ry="9" fill="#1F3A52"/>
+          <circle cx="60" cy="49" r="2.5" fill="#fff"/>
+          <ellipse cx="50" cy="61" rx="7" ry="5" fill="#24527A"/>
+          <path d="M36 70 Q50 80 64 70" fill="none" stroke="#2B4C6F" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 65px;">Rank</th>
+            <th style="width: 85px;">Avatar<small>Mission 0</small></th>
+            <th style="text-align: left; padding-left: 14px;">Junior Explorer & Companion</th>
+            <th>W1: Luna<small>Max 100 pts</small></th>
+            <th>W2: Road Animals<small>Max 100 pts</small></th>
+            <th>W3: Little Bear<small>Max 100 pts</small></th>
+            <th>W4: Stitch<small>Max 100 pts</small></th>
+            <th>Total<small>Goal: 400</small></th>
+            <th>Valley Badges</th>
+            <th class="action-col" style="width: 40px;"></th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+    </div>
+
+    <div class="footer-legends">
+      <div class="legend-card">
+        <h3>🏅 Official Valley Badges</h3>
+        <div class="badges-grid">
+          <div class="badge-info"><span style="font-size: 1.5rem;">🐰</span><div><strong>Heart Listener Badge</strong><span>Awarded by Luna (Week 1)</span></div></div>
+          <div class="badge-info"><span style="font-size: 1.5rem;">🐴</span><div><strong>Sound Detective Badge</strong><span>Awarded by Road Animals (Week 2)</span></div></div>
+          <div class="badge-info"><span style="font-size: 1.5rem;">🐻</span><div><strong>Emotion Reader Badge</strong><span>Awarded by Little Bear (Week 3)</span></div></div>
+          <div class="badge-info"><span style="font-size: 1.5rem;">💙</span><div><strong>Kindness Hero Badge</strong><span>Awarded by Stitch (Week 4)</span></div></div>
+          <div class="badge-info" style="background: #FFF6D6; border-color: #D49B27;"><span style="font-size: 1.5rem;">🏆</span><div><strong>Master Emotion Explorer Medal</strong><span>Capstone: All 4 Valley Badges!</span></div></div>
+        </div>
+      </div>
+
+      <div class="legend-card">
+        <h3>☀️ Weekly Sunlight Points (100 pts / week)</h3>
+        <ul class="points-list">
+          <li>🎨 Emotion Drawing Portfolio: <strong>40 pts</strong> (Rescue: 25 pts)</li>
+          <li>🎙️ English Chunk Voice Note: <strong>40 pts</strong> (Rescue: 30 pts)</li>
+          <li>🤝 Family Co-Pilot Teamwork: <strong>20 pts</strong> (Rescue: 15 pts)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="avatarUploader" accept="image/*" style="display: none;" />
+
+  <script id="boardDataScript">
+    // DATOS DE ESTUDIANTES (Se actualizan al exportar el archivo)
+    let students = [
+      { id: 1, name: "Sofía & Chispas", companion: "Blue Winged Monster", avatar: "", w1: 100, w2: 100, w3: 100, w4: 100, badges: { luna: true, road: true, bear: true, stitch: true } },
+      { id: 2, name: "Mateo & Rex", companion: "Green Explorer Dino", avatar: "", w1: 100, w2: 80, w3: 100, w4: 0, badges: { luna: true, road: true, bear: true, stitch: false } },
+      { id: 3, name: "Lucía & Misi", companion: "Rainbow Cat", avatar: "", w1: 80, w2: 100, w3: 0, w4: 0, badges: { luna: true, road: true, bear: false, stitch: false } },
+      { id: 4, name: "Camilo & Blub", companion: "Three-Eyed Buddy", avatar: "", w1: 100, w2: 0, w3: 0, w4: 0, badges: { luna: true, road: false, bear: false, stitch: false } }
+    ];
+  </script>
+
+  <script>
+    const ADMIN_KEY = "valle"; // Clave secreta para desbloquear edición
+    let isAdmin = false;
+    let currentUploadId = null;
+
+    // Verificar si la URL tiene ?admin=valle
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("admin") === ADMIN_KEY) {
+      enableAdmin();
+    }
+
+    function unlockPrompt() {
+      if (isAdmin) return;
+      const pass = prompt("Ingresa la clave docente para editar:");
+      if (pass === ADMIN_KEY) {
+        enableAdmin();
+      }
+    }
+
+    function enableAdmin() {
+      isAdmin = true;
+      document.body.classList.add("admin-mode");
+      renderTable();
+    }
+
+    function lockBoard() {
+      isAdmin = false;
+      document.body.classList.remove("admin-mode");
+      renderTable();
+    }
+
+    function renderTable() {
+      students.sort((a, b) => (b.w1 + b.w2 + b.w3 + b.w4) - (a.w1 + a.w2 + a.w3 + a.w4));
+      const tbody = document.getElementById("leaderboardBody");
+      tbody.innerHTML = "";
+
+      students.forEach((st, index) => {
+        const total = Number(st.w1) + Number(st.w2) + Number(st.w3) + Number(st.w4);
+        const allFour = st.badges.luna && st.badges.road && st.badges.bear && st.badges.stitch;
+
+        let rankHtml = `<span class="rank-badge rank-other">${index + 1}°</span>`;
+        if (index === 0) rankHtml = `<span class="rank-badge rank-1">🥇</span>`;
+        if (index === 1) rankHtml = `<span class="rank-badge rank-2">🥈</span>`;
+        if (index === 2) rankHtml = `<span class="rank-badge rank-3">🥉</span>`;
+
+        const avatarContent = st.avatar
+          ? `<img src="${st.avatar}" alt="${st.name}" />`
+          : `<div class="avatar-placeholder">${isAdmin ? '📷 Subir' : '🐾'}</div>`;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${rankHtml}</td>
+          <td>
+            <div class="avatar-slot" ${isAdmin ? `onclick="triggerAvatarUpload(${st.id})"` : ""}>
+              ${avatarContent}
+            </div>
+          </td>
+          <td class="student-name">
+            <div ${isAdmin ? `contenteditable="true" onblur="updateText(${st.id}, 'name', this.innerText)"` : ""}>${st.name}</div>
+            <span class="companion-sub" ${isAdmin ? `contenteditable="true" onblur="updateText(${st.id}, 'companion', this.innerText)"` : ""}>✨ ${st.companion}</span>
+          </td>
+          <td>${renderScoreCell(st.id, 'w1', st.w1)}</td>
+          <td>${renderScoreCell(st.id, 'w2', st.w2)}</td>
+          <td>${renderScoreCell(st.id, 'w3', st.w3)}</td>
+          <td>${renderScoreCell(st.id, 'w4', st.w4)}</td>
+          <td><span class="total-pill">${total} pts</span></td>
+          <td>
+            <div class="badges-row">
+              <span class="badge-chip ${st.badges.luna ? 'unlocked' : ''}" ${isAdmin ? `onclick="toggleBadge(${st.id}, 'luna')"` : ""}>🐰</span>
+              <span class="badge-chip ${st.badges.road ? 'unlocked' : ''}" ${isAdmin ? `onclick="toggleBadge(${st.id}, 'road')"` : ""}>🐴</span>
+              <span class="badge-chip ${st.badges.bear ? 'unlocked' : ''}" ${isAdmin ? `onclick="toggleBadge(${st.id}, 'bear')"` : ""}>🐻</span>
+              <span class="badge-chip ${st.badges.stitch ? 'unlocked' : ''}" ${isAdmin ? `onclick="toggleBadge(${st.id}, 'stitch')"` : ""}>💙</span>
+              <span class="badge-chip capstone ${allFour ? 'unlocked' : ''}">🏆</span>
+            </div>
+          </td>
+          <td class="action-col">
+            <button class="delete-row-btn" onclick="deleteStudent(${st.id})">✖</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function renderScoreCell(id, week, val) {
+      if (isAdmin) {
+        return `<input class="score-input" type="number" min="0" max="100" value="${val}" onchange="updateScore(${id}, '${week}', this.value)" />`;
+      }
+      return `<span class="score-display">${val > 0 ? val + ' pts' : '—'}</span>`;
+    }
+
+    function updateScore(id, week, value) {
+      const st = students.find(s => s.id === id);
+      if (st) { st[week] = Math.max(0, Math.min(100, Number(value) || 0)); renderTable(); }
+    }
+
+    function updateText(id, field, text) {
+      const st = students.find(s => s.id === id);
+      if (st) { st[field] = text.replace("✨ ", "").trim(); }
+    }
+
+    function toggleBadge(id, badgeKey) {
+      const st = students.find(s => s.id === id);
+      if (st) { st.badges[badgeKey] = !st.badges[badgeKey]; renderTable(); }
+    }
+
+    function triggerAvatarUpload(id) {
+      currentUploadId = id;
+      document.getElementById("avatarUploader").click();
+    }
+
+    document.getElementById("avatarUploader").addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if (!file || !currentUploadId) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const st = students.find(s => s.id === currentUploadId);
+        if (st) { st.avatar = e.target.result; renderTable(); }
+      };
+      reader.readAsDataURL(file);
+      event.target.value = "";
+    });
+
+    function addStudent() {
+      students.push({
+        id: Date.now(), name: "Nuevo Explorador", companion: "Dibujo Misión 0",
+        avatar: "", w1: 0, w2: 0, w3: 0, w4: 0,
+        badges: { luna: false, road: false, bear: false, stitch: false }
+      });
+      renderTable();
+    }
+
+    function deleteStudent(id) {
+      students = students.filter(s => s.id !== id);
+      renderTable();
+    }
+
+    // Descarga una copia del archivo HTML con los nuevos puntajes y fotos ya incrustados
+    function exportUpdatedHTML() {
+      lockBoard();
+      const dataScript = document.getElementById("boardDataScript");
+      dataScript.textContent = `\n    let students = ${JSON.stringify(students, null, 2)};\n  `;
+      const fullHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+      const blob = new Blob([fullHtml], { type: "text/html" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "leaderboard.html";
+      a.click();
+      enableAdmin();
+    }
+
+    renderTable();
+  </script>
+</body>
+</html>
