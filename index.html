@@ -358,7 +358,7 @@
             <th>W1: Luna<small>Max 100 pts</small></th>
             <th>W2: Road Animals<small>Max 100 pts</small></th>
             <th>W3: Little Bear<small>Max 100 pts</small></th>
-            <th>W4: Cabypara<small>Max 100 pts</small></th>
+            <th>W4: Capybara<small>Max 100 pts</small></th>
             <th>Total<small>Goal: 400</small></th>
             <th>Valley Badges</th>
             <th class="action-col" style="width: 40px;"></th>
@@ -441,7 +441,7 @@
 
       students.forEach((st, index) => {
         const total = Number(st.w1) + Number(st.w2) + Number(st.w3) + Number(st.w4);
-        const allFour = st.badges.luna && st.badges.road && st.badges.bear && st.badges.stitch;
+        const allFour = st.badges.luna && st.badges.road && st.badges.bear && st.badges.capybara;
 
         let rankHtml = `<span class="rank-badge rank-other">${index + 1}°</span>`;
         if (index === 0) rankHtml = `<span class="rank-badge rank-1">🥇</span>`;
@@ -474,7 +474,7 @@
               <span class="badge-chip ${st.badges.luna ? 'unlocked' : ''}" ${isAdmin ? `onclick="toggleBadge(${st.id}, 'luna')"` : ""}>🐰</span>
               <span class="badge-chip ${st.badges.road ? 'unlocked' : ''}" ${isAdmin ? `onclick="toggleBadge(${st.id}, 'road')"` : ""}>🐴</span>
               <span class="badge-chip ${st.badges.bear ? 'unlocked' : ''}" ${isAdmin ? `onclick="toggleBadge(${st.id}, 'bear')"` : ""}>🐻</span>
-              <span class="badge-chip ${st.badges.stitch ? 'unlocked' : ''}" ${isAdmin ? `onclick="toggleBadge(${st.id}, 'stitch')"` : ""}>💙</span>
+              <span class="badge-chip ${st.badges.capybara ? 'unlocked' : ''}" ${isAdmin ? `onclick="toggleBadge(${st.id}, 'stitch')"` : ""}>🦫</span>
               <span class="badge-chip capstone ${allFour ? 'unlocked' : ''}">🏆</span>
             </div>
           </td>
@@ -529,7 +529,7 @@
       students.push({
         id: Date.now(), name: "Nuevo Explorador", companion: "Dibujo Misión 0",
         avatar: "", w1: 0, w2: 0, w3: 0, w4: 0,
-        badges: { luna: false, road: false, bear: false, stitch: false }
+        badges: { luna: false, road: false, bear: false, capybara: false }
       });
       renderTable();
     }
